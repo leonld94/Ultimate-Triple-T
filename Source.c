@@ -62,7 +62,11 @@ int combatMap[9][9] = {	// (0, 0)		0 1 2		3 4 5		6 7 8
 	{ 0, 0, 0, 12, 9, 0, 12, 12, 9 },
 	{ 0, 0, 0, 12, 9, 0, 12, 12, 9 }
 };
-
+int getAT[3][3] = {
+	{0,1,2},
+	{3,4,5},
+	{6,7,8}
+};
 
 
 
@@ -74,7 +78,8 @@ int combatMap[9][9] = {	// (0, 0)		0 1 2		3 4 5		6 7 8
 COORD NWcombatWarTable[10] = {
 	{ 0, 0 }, { 0, 3 }, { 0, 6 },
 	{ 3, 0 }, { 3, 3 }, { 3, 6 },
-	{ 6, 0 }, { 6, 3 }, { 6, 6 }
+	{ 6, 0 }, { 6, 3 }, { 6, 6 },
+	{ 0, 0 }
 };
 
 //0 0    0 3    0 6
@@ -85,12 +90,20 @@ COORD NWcombatWarTable[10] = {
 COORD SEcombatWarTable[10] = {
 	{ 2, 2 }, { 2, 5 }, { 2, 8 },
 	{ 5, 2 }, { 5, 5 }, { 5, 8 },
-	{ 8, 2 }, { 8, 5 }, { 8, 8 }
+	{ 8, 2 }, { 8, 5 }, { 8, 8 },
+	{ 8, 8 }
 };
 //2 2    2 5    2 8
 //5 2    5 5    5 8
 //8 2    8 5    8 8
-
+COORD getCursor[3][3] = {
+	{{1,1}, {1,4}, {1,7}},
+	{{4,1}, {4,4}, {4,6}},
+	{{7,1}, {7,4}, {7,7}}
+};
+// 1 1    1 4    1 7
+// 4 1    4 4    4 7
+// 7 1    7 4    7 7
 
 
 
@@ -312,26 +325,27 @@ void printScreen() {
 }
 
 void input() {
-	// 아직 자세히는 안함. 위치 고정이라던가 해야함
-
 	switch (getch()) {
 	case 72:
-	case 'w': curX -= curX > 0 ? 1 : 0;
+	case 'w': curX -= curX > NWcombatWarTable[ATfield].X ? 1 : 0;
 		break;
 	case 75:
-	case 'a': curY -= curY > 0 ? 1 : 0;
+	case 'a': curY -= curY > NWcombatWarTable[ATfield].Y ? 1 : 0;
 		break;
 	case 80:
-	case 's': curX += curX < 8 ? 1 : 0;
+	case 's': curX += curX < SEcombatWarTable[ATfield].X ? 1 : 0;
 		break;
 	case 77:
-	case 'd': curY += curY < 8 ? 1 : 0;
+	case 'd': curY += curY < SEcombatWarTable[ATfield].Y ? 1 : 0;
 		break;
 	case ' ':
 		if (combatMap[curX][curY] == 0 || combatMap[curX][curY] == NORMAL) {
 			combatMap[curX][curY] = BLUE + playerColor[player];
 			player = !player;
 		}
+		ATfield = getAT[curX % 3][curY % 3]; // 테이블이 해당 ATfield값 뱉어내기
+		curX = getCursor[curX%3][curY%3].X; // 테이블이 해당 좌표 이동 시키기
+		curY = getCursor[curX % 3][curY % 3].Y; // 테이블이 해당 좌표 이동 시키기
 		break;
 	}
 }
@@ -346,7 +360,8 @@ void mapReset() {
 void startGame() {
 	system("cls");
 	curX = 4; curY = 4;
-
+	ATfield = 9;
+	
 	// 본게임에서는 넣어둬야하지만 아직은 시험단계니 안넣을까 하는데
 	//mapReset();
 
