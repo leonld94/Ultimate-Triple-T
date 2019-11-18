@@ -3,7 +3,7 @@
 #include <stdlib.h>
 #include <conio.h>
 
-// 빈칸( 노말 ) if(combatMap[i][j] == 7) □
+// 빈칸( 노말 ) if(combatMap[i][j] <= NORMAL) □
 #define NORMAL 7
 
 // 빨강/파랑 말 else if(combatMap[i][j] < 13) 
@@ -72,12 +72,6 @@ int getAT[3][3] = {
 	{6,7,8}
 };
 
-
-
-
-
-
-
 //		컴뱃 영역을 워 위치에 지정		탐색 위치 지정 / 북서 위치 고정에 쓰임
 COORD NWcombatWarTable[10] = {
 	{ 0, 0 }, { 0, 3 }, { 0, 6 },
@@ -102,127 +96,102 @@ COORD SEcombatWarTable[10] = {
 //8 2    8 5    8 8
 COORD getCursor[3][3] = {
 	{{1,1}, {1,4}, {1,7}},
-	{{4,1}, {4,4}, {4,6}},
+	{{4,1}, {4,4}, {4,7}},
 	{{7,1}, {7,4}, {7,7}}
 };
 // 1 1    1 4    1 7
 // 4 1    4 4    4 7
 // 7 1    7 4    7 7
 
-
-
-
-
-
-
-
-
-
 int curX, curY;			// 입력때 조건에 따라 변동되고, 출력때 이를 감지해서 출력을 바꿈
 int player;						// 0이면 RED이고 1이면 BLUE임
 int playerColor[2] = { 3, 0 };	// RED이면 3을 더해줘서 색을 맞춰야함
-
-
-
-
-
-
 int ATfield;	// 0~8까지는 각 번호, 9는 제한 없음
 
-
-
-
-
-
-
 ///
-
 
 int Check(int* map, int n, int x, int y);
 void gotoxy(int x, int y);
 void printScreen();
-void input();
+int input();
 void mapReset();
-
-
-void startGame();
-
-
+int startGame();
 
 int main() {
 	int i, j, k, n;
-	int choose = 1;
+	int choose = 1, repeat;
 	CONSOLE_CURSOR_INFO Cursor;
 	Cursor.bVisible = 0;
 	Cursor.dwSize = 1;
 	SetConsoleCursorInfo(GetStdHandle(STD_OUTPUT_HANDLE), &Cursor);
 
-
-	printf("\n"); SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), RED);
-	printf("   @@@ @@@ @@@     @@@@@  @@@ @@   @@    @     @@@@@  @@@@@  "); printf("\n");
-	printf("    @   @   @      @ @ @   @   @   @     @     @ @ @   @   @ "); printf("\n");
-	printf("    @   @   @     @  @  @  @   @@ @@     @    @  @  @  @     "); printf("\n");
-	printf("    @   @   @        @     @   @@ @@    @ @      @     @  @  "); printf("\n");
-	printf("    @   @   @        @     @   @@ @@    @ @      @     @@@@  "); printf("\n"); SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), BLUE);
-	printf("    @   @   @        @     @   @ @ @    @ @      @     @  @  "); printf("\n");
-	printf("    @   @   @        @     @   @ @ @    @@@      @     @     "); printf("\n");
-	printf("    @   @   @   @    @     @   @   @   @   @     @     @     "); printf("\n");
-	printf("    @   @   @  @     @     @   @   @   @   @     @     @   @ "); printf("\n");
-	printf("     @@@   @@@@@    @@@   @@@ @@@ @@@ @@@ @@@   @@@   @@@@@  "); printf("\n"); SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), WHITE);
-	printf("\n");
-	printf("\t\t\t\t\t\Tic Tac Toe"); printf("\n");
-	printf("\n");
-	printf("\n"); SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), NORMAL);
-	printf("\t\t Press Enter to Start");
-	printf("\n");
-	printf("\n");
-	printf("\t\t\tEND");
-
 	while (1) {
-		if (choose) {
-			gotoxy(40, 15);
-			printf("◀");
-			gotoxy(30, 17);
-			printf("    ");
-		}
-		else {
-			gotoxy(30, 17);
-			printf("◀");
-			gotoxy(40, 15);
-			printf("    ");
-		}
+		system("cls");
+		printf("\n"); SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), RED);
+		printf("   @@@ @@@ @@@     @@@@@  @@@ @@   @@    @     @@@@@  @@@@@  "); printf("\n");
+		printf("    @   @   @      @ @ @   @   @   @     @     @ @ @   @   @ "); printf("\n");
+		printf("    @   @   @     @  @  @  @   @@ @@     @    @  @  @  @     "); printf("\n");
+		printf("    @   @   @        @     @   @@ @@    @ @      @     @  @  "); printf("\n");
+		printf("    @   @   @        @     @   @@ @@    @ @      @     @@@@  "); printf("\n"); SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), BLUE);
+		printf("    @   @   @        @     @   @ @ @    @ @      @     @  @  "); printf("\n");
+		printf("    @   @   @        @     @   @ @ @    @@@      @     @     "); printf("\n");
+		printf("    @   @   @   @    @     @   @   @   @   @     @     @     "); printf("\n");
+		printf("    @   @   @  @     @     @   @   @   @   @     @     @   @ "); printf("\n");
+		printf("     @@@   @@@@@    @@@   @@@ @@@ @@@ @@@ @@@   @@@   @@@@@  "); printf("\n"); SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), WHITE);
+		printf("\n");
+		printf("\t\t\t\t\t\Tic Tac Toe"); printf("\n");
+		printf("\n");
+		printf("\n"); SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), NORMAL);
+		printf("\t\t Press Enter to Start");
+		printf("\n");
+		printf("\n");
+		printf("\t\t\tEND");
 
+		for (repeat = 0; !repeat;) {
+			if (choose) {
+				gotoxy(40, 15);
+				printf("◀");
+				gotoxy(30, 17);
+				printf("    ");
+			}
+			else {
+				gotoxy(30, 17);
+				printf("◀");
+				gotoxy(40, 15);
+				printf("    ");
+			}
 
-		n = getch();
-		switch (n) {
-		case 13:
-			if (choose) startGame();		// 시작
-			else return 0;		// 종료
-			break;
-		case 72:
-		case 'w':
-		case 80:
-		case 's':
-			choose = !choose; break;
-		default:break;
+			n = getch();
+			switch (n) {
+			case ' ':
+				if (choose) for(;!repeat;)repeat = startGame();		// 시작
+				else return 0;		// 종료
+				break;
+			case 72:
+			case 'w':
+			case 80:
+			case 's':
+				choose = !choose; break;
+			default:break;
+			}
 		}
 	}
-
 }
 
 int Check(int* map, int n, int x, int y) {
 	int i;
 	// 1. Forward slash Checking
-	if (*(map + CAR(x + 2, y, n)) == *(map + CAR(x + 1, y + 1, n)) && *(map + CAR(x + 1, y + 1, n)) == *(map + CAR(x, y + 2, n))) return *(map + CAR(x, y, n));
+	if (*(map + CAR(x + 2, y, n)) == *(map + CAR(x + 1, y + 1, n)) && *(map + CAR(x + 1, y + 1, n)) == *(map + CAR(x, y + 2, n)) && *(map +  CAR(x+1,y+1,n)) != 0) return *(map + CAR(x, y, n));
 	// 2. Backslash Checking
-	if (*(map + CAR(x, y, n)) == *(map + CAR(x + 1, y + 1, n)) && *(map + CAR(x, y, n)) == *(map + CAR(x + 2, y + 2, n))) return *(map + CAR(x, y, n));
+	if (*(map + CAR(x, y, n)) == *(map + CAR(x + 1, y + 1, n)) && *(map + CAR(x, y, n)) == *(map + CAR(x + 2, y + 2, n)) && *(map + CAR(x,y,n)) != 0) return *(map + CAR(x, y, n));
 	// 3. Horizontal Checking
 	// 4. Verical Checking
 	for (i = 0; i < 3; i++) {
-		if (*(map + CAR(x + i, y, n)) == *(map + CAR(x + i, y + 1, n)) && *(map + CAR(x + i, y, n)) == *(map + CAR(x + i, y + 2, n))) return *(map + CAR(x + i, y, n));
+		if (*(map + CAR(x + i, y, n)) == *(map + CAR(x + i, y + 1, n)) && *(map + CAR(x + i, y, n)) == *(map + CAR(x + i, y + 2, n)) && *(map + CAR(x + i, y, n)) != 0) return *(map + CAR(x + i, y, n));
 		//if (combatMap[x][y + i] == combatMap[x + 1][y + i] && combatMap[x][y + i] == combatMap[x + 2][y + i])
-		if (*(map + CAR(x, y + i, n)) == *(map + CAR(x + 1, y + i, n)) && *(map + CAR(x, y + i, n)) == *(map + CAR(x + 2, y + i, n))) return combatMap[x][y + i];
+		if (*(map + CAR(x, y + i, n)) == *(map + CAR(x + 1, y + i, n)) && *(map + CAR(x, y + i, n)) == *(map + CAR(x + 2, y + i, n)) && *(map + CAR(x, y + i, n)) != 0) return *(map + CAR(x, y + i, n));
 	}
+	return 0;
 }
 
 void gotoxy(int x, int y) {
@@ -232,24 +201,17 @@ void gotoxy(int x, int y) {
 
 void printScreen() {
 	int i, j, k, go_y = 0;
-	//system("cls");
 
 	for (i = 0; i < 9; i++) {		// 맵의 Y 축
 		NEWLINE	// 이제 \n를 대신할 것
 
 			if ((i / 3) && !(i % 3)) {	// 수평축 UI
-				//for (k = 1; k < 12; k++) {
-				//	if ((k / 4) && !(k % 4)) printf("┼ ");
-				//	else printf("─ ");
-				//}
-				////printf("\n");
 				printf("─ ─ ─ ┼ ─ ─ ─ ┼ ─ ─ ─");
 				NEWLINE
 			}
 
 		for (j = 0; j < 9; j++) {	// 맵의 X 축
 			if ((j / 3) && !(j % 3)) printf("│ ");	// 수직축 UI
-
 
 			// 출력 형식의 변동이 있음
 			// 1. 커서 위치 확인시 이에 맞는 것 출력
@@ -306,7 +268,6 @@ void printScreen() {
 		//printf("\n");
 	}
 
-
 	//getch();
 	NEWLINE
 		NEWLINE
@@ -326,9 +287,12 @@ void printScreen() {
 			SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), BLUE);
 			printf("BLUE◀");
 		}
+	//gotoxy(15, 17);
+	//printf("BLUE WIN!");
+
 }
 
-void input() {
+int input() {
 	switch (getch()) {
 	case 72:
 	case 'w': curX -= curX > NWcombatWarTable[ATfield].X ? 1 : 0;
@@ -343,7 +307,9 @@ void input() {
 	case 'd': curY += curY < SEcombatWarTable[ATfield].Y ? 1 : 0;
 		break;
 	case ' ':
-		if (combatMap[curX][curY] <= NORMAL) {
+		// 잠겨있으면 하면 안됨
+		if (warMap[curX/3][curY/3]);
+		else if (combatMap[curX][curY] <= NORMAL) {
 			combatMap[curX][curY] = BLUE + playerColor[player];
 			player = !player;
 
@@ -353,10 +319,8 @@ void input() {
 
 			warMap[curX/3][curY/3] = Check(combatMap, COMBAT, NWcombatWarTable[(curX / 3) * 3 + (curY / 3)].X, NWcombatWarTable[(curX / 3) * 3 + (curY / 3)].Y);
 			// (curX/3)*3+(curY/3)
-
 				// 2. warMap 검사	-> 엔딩 조건
-
-
+				// 엔딩조건이 좀 바뀌었는데, input함수가 void형이 아닌 int형이 되어서 결과를 출력해줘야함
 
 			if (warMap[curX % 3][curY % 3]) {	// 이미 차지 되어있다면 자유모드 돌입
 				ATfield = 9;
@@ -367,9 +331,11 @@ void input() {
 				curX = getCursor[curX % 3][curY % 3].X; // 테이블이 해당 좌표 이동 시키기
 				curY = getCursor[curX % 3][curY % 3].Y;
 			}
+			return Check(warMap, WAR, 0, 0);
 		}
 		break;
 	}
+	return 0;
 }
 
 void mapReset() {
@@ -379,16 +345,57 @@ void mapReset() {
 	for (i = 0; i < 3; i++) for (j = 0; j < 3; j++) warMap[i][j] = 0;
 }
 
-void startGame() {
+int startGame() {
+	int choose = 1, ending = 0;
 	system("cls");
 	curX = 4; curY = 4;
 	ATfield = 9;
+	player = 0;
 	
 	// 본게임에서는 넣어둬야하지만 아직은 시험단계니 안넣을까 하는데
-	//mapReset();
+	mapReset();
 
-	while (1) {
+	while (!ending) {
 		printScreen();	// 상태 출력 함수
-		input();		// 입력 처리 & 검사 함수
+		ending = input();		// 입력 처리 & 검사 함수
+	}
+	gotoxy(15, 17);
+	if (ending == RED) {
+		SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), RED);
+		printf("RED WIN!");
+		SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), NORMAL);
+	}
+	else {
+		SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), BLUE);
+		printf("BLUE WIN!");
+		SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), NORMAL);
+	}
+	//printf("메인 메뉴로\n");	// 출력 위치 정해야함		ㅇㅇㅇ WIN! 도 띄워야해서 좀 애매함
+	//printf("다시 플레이\n");
+	while (1) {
+		if (choose) {
+			SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), WHITE);
+			gotoxy(40, 8);
+			printf("메인 메뉴◀    다시 플레이        ");
+		}
+		else {
+			SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), WHITE);
+			gotoxy(40, 8);
+			printf("메인 메뉴      다시 플레이◀");
+		}
+
+		switch (getch()) {
+		case ' ':
+			if (choose) return 1;
+			else return 0;
+			break;
+		case 75:
+		case 'a':
+		case 77:
+		case 'd':
+			choose = !choose;
+			break;
+		default:break;
+		}
 	}
 }
