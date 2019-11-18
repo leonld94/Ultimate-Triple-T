@@ -48,7 +48,11 @@
 
 /// 전역변수 선언 구역
 
-int warMap[3][3];			// (0, 0)
+int warMap[3][3];
+// 0 0    0 1    0 2
+// 1 0    1 1    1 2
+// 2 0    2 1    2 2
+
 int combatMap[9][9] = {	// (0, 0)		0 1 2		3 4 5		6 7 8
 	{ 0, 0, 0, 12, 9, 0, 12, 12, 9 },
 	{ 0, 0, 0, 12, 9, 0, 12, 12, 9 },
@@ -339,13 +343,31 @@ void input() {
 	case 'd': curY += curY < SEcombatWarTable[ATfield].Y ? 1 : 0;
 		break;
 	case ' ':
-		if (combatMap[curX][curY] == 0 || combatMap[curX][curY] == NORMAL) {
+		if (combatMap[curX][curY] <= NORMAL) {
 			combatMap[curX][curY] = BLUE + playerColor[player];
 			player = !player;
+
+			// 게임 끝났는지 검사하고
+			// combatMap의 9개를 다 검사한 후 이를 적용시켜 warMap을 검사해야함
+				// 1. 변화가 일어난 combatMap만 검사	-> warMap 영향 조건
+
+			warMap[curX/3][curY/3] = Check(combatMap, COMBAT, NWcombatWarTable[(curX / 3) * 3 + (curY / 3)].X, NWcombatWarTable[(curX / 3) * 3 + (curY / 3)].Y);
+			// (curX/3)*3+(curY/3)
+
+				// 2. warMap 검사	-> 엔딩 조건
+
+
+
+			if (warMap[curX % 3][curY % 3]) {	// 이미 차지 되어있다면 자유모드 돌입
+				ATfield = 9;
+				curX = curY = 4;
+			}
+			else {
+				ATfield = getAT[curX % 3][curY % 3]; // 테이블이 해당 ATfield값 뱉어내기
+				curX = getCursor[curX % 3][curY % 3].X; // 테이블이 해당 좌표 이동 시키기
+				curY = getCursor[curX % 3][curY % 3].Y;
+			}
 		}
-		ATfield = getAT[curX % 3][curY % 3]; // 테이블이 해당 ATfield값 뱉어내기
-		curX = getCursor[curX%3][curY%3].X; // 테이블이 해당 좌표 이동 시키기
-		curY = getCursor[curX % 3][curY % 3].Y; // 테이블이 해당 좌표 이동 시키기
 		break;
 	}
 }
@@ -366,67 +388,7 @@ void startGame() {
 	//mapReset();
 
 	while (1) {
-
-		// 전의 상태를 따져서 커서의 위치를 옮겨놔야함
-		// 맵출력
-		printScreen();
-		// 입력받고 / 입력되는지 검사하고
-		// 입력 정상적으로 되면 가상의 맵의 커서위치를 각각 %3 하여 국지적으로 둔 위치를 찾고 그걸 warMap 좌표에 넣어 다음 고정 전투를 잡는다.
-
-		// 플레이어 바뀌는건 어캐 구현할꺼임?
-		// 그냥 while문 돌리면서 bool값 바꿀까?
-
-		// 문제가 하나 생김. 그냥 combatMap에 커서값 넣고 그걸 출력하면 커서랑 겹쳐있는 곳은 값이 소멸됨.
-		// 즉, 커서 위치를 printScreen에서 감지해서 값을 바꿔야함.
-		// 이에 따라 생기는 문제 : 딱히 없어보이는데? 단지 출력처리에서 전역으로 선언한 커서의 위치를 찾으면 됨
-		// 또는, 홀로그램 맵을 하나 만들어서 그 위에 출력처리를 다 한다음에 printScreen은 그걸 출력하기만 하면 됨.
-		// 이에 따라 생기는 문제 : 홀로그램 맵 따로 만들고 printScreen 함수에 있는 combatMap을 다 바꿔야함
-
-		input();
-		// 입력을 함수로 만들까? 아니면 그냥 여기에 구현을 할까?
-		// 1.함수 구현
-		// 장점 : 정확히 역할을 나누기 때문에 보기 좋음
-		// 단점 : 함수 호출에 의해 느려질 수 있음
-		// 2. 내부 구현
-		// 장점 : 당연히 함수 호출보다 속도가 빠름
-		// 단점 : 함수로 나누는 것보다 주석으로만 설명 달아두면 가독성이 떨어짐
-
-
-		// 게임 끝났는지 검사하고
-		// combatMap의 9개를 다 검사한 후 이를 적용시켜 warMap을 검사해야함
-		//getch();
+		printScreen();	// 상태 출력 함수
+		input();		// 입력 처리 & 검사 함수
 	}
 }
-
-// 성현이
-//void printMap() {
-//	int i, j;
-//	cnt = 0;
-//	for (i = 0; i < 9; i++) {
-//		for (j = 0; j < 9; j++) {
-//			if (ttt[i][j] != 0) cnt++;
-//			gotoxy((j + 1) * 2 + (j / 3) * 2, (i + 1) + i / 3);
-//			if (TTT[i / 3][j / 3] != 0) {
-//				if (j == x && i == y) printcolor("◆", (turn % 2 == 1 ? 4 : 3));
-//				else printcolor("▣", (TTT[i / 3][j / 3] % 2 == 1 ? 4 : 3));
-//			}
-//			else if (j == x && i == y) {
-//				if (ttt[i][j] == 0) printcolor("◆", (turn % 2 == 1 ? 4 : 3));
-//				else printcolor("●", (ttt[y][x] == 1 ? 4 : 3));
-//			}
-//			else {
-//				if (ttt[i][j] != 0) printcolor("■", (ttt[i][j] == 1 ? 4 : 3));
-//				else if (pos == 0 || ((i >= (pos - 1) / 3 * 3 && i <= (pos - 1) / 3 * 3 + 2) && (j >= (pos - 1) % 3 * 3 && j <= (pos - 1) % 3 * 3 + 2))) printcolor("□", 8);
-//				else printcolor("□", 15);
-//			}
-//			if (j == 2 || j == 5) printcolor("│ ", 15);
-//		}
-//		if (i == 2 || i == 5) printcolor("\n  ─ ─ ─ ┼ ─ ─ ─ ┼ ─ ─ ─ ", 15);
-//	}
-//	SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 4);
-//	printf("\n\n  %s %s %d", turn % 2 == 1 ? ":arrow_forward:" : "  ", p1, P1);
-//	SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 15);
-//	printf(" : ");
-//	SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 3);
-//	printf(" %d %s %s", P2, p2, turn % 2 == 0 ? ":arrow_backward:" : "  ");
-//}
