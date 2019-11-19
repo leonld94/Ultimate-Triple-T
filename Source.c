@@ -181,9 +181,9 @@ int main() {
 int Check(int* map, int n, int x, int y) {
 	int i;
 	// 1. Forward slash Checking
-	if (*(map + CAR(x + 2, y, n)) == *(map + CAR(x + 1, y + 1, n)) && *(map + CAR(x + 1, y + 1, n)) == *(map + CAR(x, y + 2, n)) && *(map +  CAR(x+1,y+1,n)) != 0) return *(map + CAR(x, y, n));
+	if (*(map + CAR(x + 2, y, n)) == *(map + CAR(x + 1, y + 1, n)) && *(map + CAR(x + 1, y + 1, n)) == *(map + CAR(x, y + 2, n)) && *(map +  CAR(x + 1,y + 1,n)) != 0) return *(map + CAR(x + 1, y + 1, n));
 	// 2. Backslash Checking
-	if (*(map + CAR(x, y, n)) == *(map + CAR(x + 1, y + 1, n)) && *(map + CAR(x, y, n)) == *(map + CAR(x + 2, y + 2, n)) && *(map + CAR(x,y,n)) != 0) return *(map + CAR(x, y, n));
+	if (*(map + CAR(x, y, n)) == *(map + CAR(x + 1, y + 1, n)) && *(map + CAR(x, y, n)) == *(map + CAR(x + 2, y + 2, n)) && *(map + CAR(x, y, n)) != 0) return *(map + CAR(x, y, n));
 	// 3. Horizontal Checking
 	// 4. Verical Checking
 	for (i = 0; i < 3; i++) {
@@ -217,7 +217,13 @@ void printScreen() {
 			// 1. 커서 위치 확인시 이에 맞는 것 출력
 			// 1-1. 일반커서, 커서가 말과 겹친 것, 커서가 땅과 겹친 것
 			if (curX == i && curY == j) {
-				if (combatMap[i][j] <= NORMAL)	// 일반커서
+				if (warMap[curX/3][curY/3])		// 이미 먹힌 땅이라면?
+				{
+					SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), warMap[curX/3][curY/3]);
+					printf("◎");
+
+				}
+				else if (combatMap[i][j] <= NORMAL)	// 일반커서
 				{
 					// 색 정하는 기준을 정해야함. 아마 전역변수가 편할듯		입력에서 정하게 되겠지
 					SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), BLUE + playerColor[player]);
@@ -237,6 +243,10 @@ void printScreen() {
 				SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), NORMAL);
 			}
 			// 2. 일반 분지
+			else if (warMap[i / 3][j / 3]) {
+				SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), warMap[i / 3][j / 3]);
+				printf("▣");
+			}
 			else if (combatMap[i][j] <= NORMAL) {
 				SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), NORMAL);
 				printf("□");
@@ -287,9 +297,6 @@ void printScreen() {
 			SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), BLUE);
 			printf("BLUE◀");
 		}
-	//gotoxy(15, 17);
-	//printf("BLUE WIN!");
-
 }
 
 int input() {
@@ -359,17 +366,23 @@ int startGame() {
 		printScreen();	// 상태 출력 함수
 		ending = input();		// 입력 처리 & 검사 함수
 	}
-	gotoxy(15, 17);
+	printScreen();
+
+	
 	if (ending == RED) {
+		gotoxy(49, 6);
 		SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), RED);
 		printf("RED WIN!");
 		SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), NORMAL);
 	}
 	else {
+		gotoxy(48, 6);
 		SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), BLUE);
 		printf("BLUE WIN!");
 		SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), NORMAL);
 	}
+	
+
 	//printf("메인 메뉴로\n");	// 출력 위치 정해야함		ㅇㅇㅇ WIN! 도 띄워야해서 좀 애매함
 	//printf("다시 플레이\n");
 	while (1) {
