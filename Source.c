@@ -10,6 +10,7 @@
 //■
 #define RED 12
 #define BLUE 9
+#define YELLOW 14
 #define WHITE 15
 
 // 커서
@@ -27,9 +28,9 @@
 int warMap[3][3];
 int combatMap[9][9];
 int getAT[3][3] = {
-	{0,1,2},
-	{3,4,5},
-	{6,7,8}
+	{ 0, 1, 2 },
+	{ 3, 4, 5 },
+	{ 6, 7, 8 }
 };
 
 //		컴뱃 영역을 워 위치에 지정		탐색 위치 지정 / 북서 위치 고정에 쓰임
@@ -47,9 +48,9 @@ COORD SEcombatWarTable[10] = {
 	{ 8, 8 }
 };
 COORD getCursor[3][3] = {
-	{{1,1}, {1,4}, {1,7}},
-	{{4,1}, {4,4}, {4,7}},
-	{{7,1}, {7,4}, {7,7}}
+	{ { 1, 1 }, { 1, 4 }, { 1, 7 } },
+	{ { 4, 1 }, { 4, 4 }, { 4, 7 } },
+	{ { 7, 1 }, { 7, 4 }, { 7, 7 } }
 };
 
 int curX, curY;					// 입력때 조건에 따라 변동되고, 출력때 이를 감지해서 출력을 바꿈
@@ -111,7 +112,7 @@ int main() {
 			n = getch();
 			switch (n) {
 			case ' ':
-				if (choose) for(;!repeat;)repeat = startGame();		// 시작
+				if (choose) for (; !repeat;)repeat = startGame();		// 시작
 				else return 0;		// 종료
 				break;
 			case 72:
@@ -128,7 +129,7 @@ int main() {
 int Check(int* map, int n, int x, int y) {
 	int i;
 	// 1. Forward slash Checking
-	if (*(map + CAR(x + 2, y, n)) == *(map + CAR(x + 1, y + 1, n)) && *(map + CAR(x + 1, y + 1, n)) == *(map + CAR(x, y + 2, n)) && *(map +  CAR(x + 1,y + 1,n)) != 0) return *(map + CAR(x + 1, y + 1, n));
+	if (*(map + CAR(x + 2, y, n)) == *(map + CAR(x + 1, y + 1, n)) && *(map + CAR(x + 1, y + 1, n)) == *(map + CAR(x, y + 2, n)) && *(map + CAR(x + 1, y + 1, n)) != 0) return *(map + CAR(x + 1, y + 1, n));
 	// 2. Backslash Checking
 	if (*(map + CAR(x, y, n)) == *(map + CAR(x + 1, y + 1, n)) && *(map + CAR(x, y, n)) == *(map + CAR(x + 2, y + 2, n)) && *(map + CAR(x, y, n)) != 0) return *(map + CAR(x, y, n));
 	for (i = 0; i < 3; i++) {
@@ -158,9 +159,9 @@ void printScreen() {
 			if ((j / 3) && !(j % 3)) printf("│ ");	// 수직축 UI
 
 			if (curX == i && curY == j) {
-				if (warMap[curX/3][curY/3])		// 이미 먹힌 땅이라면?
+				if (warMap[curX / 3][curY / 3])		// 이미 먹힌 땅이라면?
 				{
-					SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), warMap[curX/3][curY/3]);
+					SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), warMap[curX / 3][curY / 3]);
 					printf("◎");
 
 				}
@@ -189,8 +190,18 @@ void printScreen() {
 				printf("▣");
 			}
 			else if (combatMap[i][j] <= NORMAL) {
-				SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), NORMAL);
-				printf("□");
+				if (ATfield == 9){
+					SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), YELLOW);
+					printf("□");
+				}
+				else if (NWcombatWarTable[ATfield].X <= i && NWcombatWarTable[ATfield].Y <= j && SEcombatWarTable[ATfield].X >= i && SEcombatWarTable[ATfield].Y >= j){
+					SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), YELLOW);
+					printf("□");
+				}
+				else{
+					SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), NORMAL);
+					printf("□");
+				}
 			}
 			// 3. 말 영역
 			else if (combatMap[i][j] < 13) {
@@ -241,12 +252,12 @@ int input() {
 	case 'd': curY += curY < SEcombatWarTable[ATfield].Y ? 1 : 0;
 		break;
 	case ' ':
-		if (warMap[curX/3][curY/3]);
+		if (warMap[curX / 3][curY / 3]);
 		else if (combatMap[curX][curY] <= NORMAL) {
 			combatMap[curX][curY] = BLUE + playerColor[player];
 			player = !player;
 
-			warMap[curX/3][curY/3] = Check(combatMap, COMBAT, NWcombatWarTable[(curX / 3) * 3 + (curY / 3)].X, NWcombatWarTable[(curX / 3) * 3 + (curY / 3)].Y);
+			warMap[curX / 3][curY / 3] = Check(combatMap, COMBAT, NWcombatWarTable[(curX / 3) * 3 + (curY / 3)].X, NWcombatWarTable[(curX / 3) * 3 + (curY / 3)].Y);
 
 			if (warMap[curX % 3][curY % 3]) {	// 이미 차지 되어있다면 자유모드 돌입
 				ATfield = 9;
