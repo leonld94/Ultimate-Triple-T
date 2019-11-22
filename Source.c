@@ -77,7 +77,7 @@ int main() {
 		printf("\t\t\t\t\t\Tic Tac Toe"); printf("\n");
 		printf("\n");
 		printf("\n"); SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), NORMAL);
-		printf("\t\t Press Enter to Start");
+		printf("\t\t Press Space to Start");
 		printf("\n");
 		printf("\n");
 		printf("\t\t\tEND");
